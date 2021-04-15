@@ -1,6 +1,8 @@
+#!/usr/bin/python
+
 import argparse
 from database_helpers import *
-from qbest_helpers import *
+from search_helpers import *
 import pandas as pd
 from tqdm import tqdm
 from tqdm.contrib.concurrent import process_map, cpu_count
@@ -33,6 +35,8 @@ if len(search_manifest) > 0:
         max_workers = 1
 
     process_map(qbestd, search_manifest, max_workers=max_workers, chunksize=1, disable=not args.progress)
+
+    print("Search complete!")
 
 else:
 

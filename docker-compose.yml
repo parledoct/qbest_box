@@ -1,0 +1,12 @@
+version: '3.5'
+
+services:
+    search:
+        image: "parledoct/qbestd_box"
+        volumes:
+            - ${PWD}:/qbestd_box
+        working_dir: /qbestd_box
+        entrypoint:
+            - /bin/bash
+        stdin_open: true
+        tty: true

@@ -3,6 +3,7 @@ from database_helpers import *
 from qbest_helpers import *
 import pandas as pd
 from tqdm import tqdm
+from tqdm.contrib.concurrent import process_map, cpu_count
 
 parser = argparse.ArgumentParser(
     description='example: python qbest.py c4f0f58d1af2223da0519dc0496e7600 afeb2b96e36f1b38548959b3494a91e7',
@@ -13,19 +14,26 @@ parser.add_argument('query_id', help='Identifier for a query features file or a 
 parser.add_argument('test_id',  help='Identifier for a test item features file or a test item collection.')
 
 parser.add_argument("-p","--progress",action="store_true",help="show progress bar.")
+parser.add_argument("-c","--concurrent",action="store_true",help="run DTW searches concurrently.")
+
+parser.add_argument("-w", "--max_workers", default=None, help = "if running concurrent jobs, maximum number of workers (default: use all available cores)")
 
 args = parser.parse_args()
+
+print("Creating search manifest...")
 
 search_manifest = create_manifest(args.query_id, args.test_id)
 
 if len(search_manifest) > 0:
 
-    for i in tqdm(range(len(search_manifest)), disable=not args.progress):
+    if args.concurrent:
+        # max(32, cpu_count() + 4) is default, see https://tqdm.github.io/docs/contrib.concurrent/
+        max_workers = max(32, cpu_count() + 4) if args.max_workers is None else int(args.max_workers)
+    else:
+        max_workers = 1
 
-        query_id, test_id = search_manifest[i]
+    process_map(qbestd, search_manifest, max_workers=max_workers, chunksize=1, disable=not args.progress)
 
-        qbestd(
-            query_id = query_id,
-            test_id  = test_id,
-            callback = append_results
-        )
+else:
+
+    print("Empty search manifest: all query-test pairs already in results database!")

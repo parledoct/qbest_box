@@ -13,15 +13,17 @@ def create_manifest(query_id, test_id):
 
     all_combinations   = list(product(queries, tests))
 
-    completed_searches = fetch_qbestd_results()
-    completed_pairs    = zip(completed_searches['query'].values, completed_searches['test'].values)
+    relevant_pairs  = fetch_qbestd_results(queries=queries, tests=tests)
+    completed_pairs = list(zip(relevant_pairs['query'].values, relevant_pairs['test'].values))
 
     return [ p for p in all_combinations if p not in completed_pairs ]
 
 def fetch_features(file_id):
     return np.load(os.path.join('data', 'features', file_id + '.npy'))
 
-def qbestd(query_id, test_id, callback = print, win_step=4, min_match_ratio=0.5, max_match_ratio=2.0, step_pattern="symmetricP1", open_end=True):
+def qbestd(qt_tuple, callback = append_results, win_step=4, min_match_ratio=0.5, max_match_ratio=2.0, step_pattern="symmetricP1", open_end=True):
+    query_id, test_id  = qt_tuple
+
     query_feats_matrix = fetch_features(query_id)
     test_feats_matrix  = fetch_features(test_id)
 

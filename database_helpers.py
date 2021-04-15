@@ -18,6 +18,14 @@ def fetch_file_ids(collection_id):
 
     return df[df.c_id == collection_id].f_id.values
 
-def fetch_qbestd_results():
+def fetch_qbestd_results(queries=None, tests=None):
 
-    return pd.read_csv('data/sqlite/qbestd_results.csv')
+    return_df = pd.read_csv('data/sqlite/qbestd_results.csv')
+
+    if queries is not None:
+        return_df = return_df[return_df["query"].isin(queries)]
+
+    if tests is not None:
+        return_df = return_df[return_df["test"].isin(tests)]
+
+    return return_df

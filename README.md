@@ -29,7 +29,7 @@
 
 3. Run a search using `qbestd.py`
 
-	Run a search using the `gos-kdl_queries` collection as queries and `gos-kdl_corpus` as test items (for collection IDs see `data/sqlite/collection_names.csv`).
+	Run a search using the `gos-kdl_queries` collection (`0375ff...`) as queries and `gos-kdl_corpus` as test items (`3e2d65...`); for collection IDs see `data/sqlite/collection_names.csv`.
 
 	```bash
 	python qbestd.py \

@@ -18,7 +18,7 @@ parser.add_argument('test_id',  help='Identifier for a test item features file o
 parser.add_argument("-p","--progress",action="store_true",help="show progress bar.")
 parser.add_argument("-c","--concurrent",action="store_true",help="run DTW searches concurrently.")
 
-parser.add_argument("-w", "--max_workers", default=None, help = "if running concurrent jobs, maximum number of workers (default: use all available cores)")
+parser.add_argument("-mw", "--max_workers", type=int,default=None, help = "if running concurrent jobs, maximum number of workers (None = use all available cores)")
 
 args = parser.parse_args()
 

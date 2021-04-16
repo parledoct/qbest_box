@@ -44,7 +44,7 @@
 	```bash
 	usage: qbestd.py [-h] [-p] [-c] [-w MAX_WORKERS] query_id test_id
 
-	example: python qbest.py c4f0f58d1af2223da0519dc0496e7600 afeb2b96e36f1b38548959b3494a91e7
+	example: python qbestd.py c4f0f58d1af2223da0519dc0496e7600 afeb2b96e36f1b38548959b3494a91e7
 
 	positional arguments:
 	  query_id              Identifier for a query features file or a query collection.

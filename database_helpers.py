@@ -12,6 +12,20 @@ def is_collection(id):
 
     return id in df.c_id.values
 
+def fetch_collection_info(collection_id):
+    df = pd.read_csv('data/sqlite/collection_names.csv')
+
+    c_info = df[df.c_id == collection_id].to_dict(orient='records')[0]
+    # c_info['files'] = fetch_file_ids(collection_id).to_list()
+
+    return c_info
+
+def fetch_file_info(file_id):
+
+    df = pd.read_csv('data/sqlite/filenames.csv')
+
+    return df[df['f_id'] == file_id]
+
 def fetch_file_ids(collection_id):
 
     df = pd.read_csv('data/sqlite/collection_links.csv')

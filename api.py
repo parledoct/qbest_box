@@ -1,14 +1,24 @@
-import flask, os
-from flask import request, jsonify, Response
+import flask, sqlite3
+from flask import request, jsonify, Response, g
 
 from database_helpers import *
+from s3_helpers import *
+from audio_helpers import *
 
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
 
+@app.teardown_appcontext
+def close_connection(exception):
+    db = getattr(g, '_database', None)
+    if db is not None:
+        db.close()
+
 @app.route('/', methods=['GET'])
 def home():
-    return "<h1>Welcome to the QbE-STD API endpoint</h1>"
+    results = query_db('select * from qbestd_results')
+
+    return '<h1>Welcome to the QbE-STD API (Version 1).</h1><a target="_blank" href="https://documenter.getpostman.com/view/15421866/TzJrDf1G">View API Documentation on Postman.</a>'
 
 @app.route('/api/v1/info', methods=['GET'])
 def api_info():
@@ -26,9 +36,13 @@ def api_info():
     if 'collection_id' in request.args:
 
         collection_id   = request.args['collection_id']
-        collection_info = fetch_collection_info(collection_id)
+        collection_info = query_db("SELECT * FROM  collection_names WHERE c_id == ?", [collection_id], one=True)
 
-        resp = jsonify(collection_info)
+        if(collection_info is None):
+            resp = jsonify({"error": "No collection exists with identifier '{}'".format(collection_id)})
+        else:
+            resp = jsonify(dict(collection_info))
+
         resp.status_code = 200
 
         return resp
@@ -75,10 +89,22 @@ def api_id():
 def post_file(filename):
     """Upload a file."""
 
-    with open(os.path.join("data/tmp", filename), "wb") as fp:
-        fp.write(request.data)
+    uploaded_files = flask.request.files.getlist("file")
+
+    for f in uploaded_files:
+        wav_bytes = f.read()
+
+        # Resample to 16 kHz and convert to mono
+        wav_bytes = process_audio(wav_bytes)
+
+        upload_file(
+            bucket = 'audio', 
+            path   = f.filename, 
+            data   = wav_bytes,
+            size   = bytes_len(wav_bytes)
+        )
 
     # Return 201 CREATED
     return "", 201
 
-app.run()
+app.run(host='0.0.0.0')

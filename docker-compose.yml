@@ -1,12 +1,33 @@
 version: '3.5'
 
 services:
-    search:
+    # search:
+    #     image: "parledoct/qbestd_box"
+    #     volumes:
+    #         - ${PWD}:/qbestd_box
+    #     working_dir: /qbestd_box
+    #     entrypoint:
+    #         - /bin/bash
+    #     stdin_open: true
+    #     tty: true
+
+    api:
         image: "parledoct/qbestd_box"
         volumes:
             - ${PWD}:/qbestd_box
         working_dir: /qbestd_box
+        ports:
+            - "5000:5000"
         entrypoint:
-            - /bin/bash
-        stdin_open: true
-        tty: true
+            - python
+            - api.py
+
+    minio:
+        image: "minio/minio"
+        ports:
+            - "9000:9000"
+        environment:
+            MINIO_ACCESS_KEY: minio
+            MINIO_SECRET_KEY: minio123
+        command: server /data
+
